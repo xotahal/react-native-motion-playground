@@ -1,20 +1,30 @@
 import React, { PureComponent } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 
 import Header from './Header';
 import Content from './Content';
 import { getPlatformElevation } from '../../utils';
 
 class ListItem extends PureComponent {
+  onPressed = () => {
+    const { onPress, item } = this.props;
+    onPress(item);
+  };
   render() {
-    const { item } = this.props;
+    const { item, isHidden } = this.props;
     const { name, ...rest } = item;
 
+    if (isHidden) {
+      return null;
+    }
+
     return (
-      <View style={styles.container}>
-        <Header name={name} />
-        <Content {...rest} />
-      </View>
+      <TouchableWithoutFeedback onPress={this.onPressed}>
+        <View style={styles.container}>
+          <Header name={name} />
+          <Content {...rest} />
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
