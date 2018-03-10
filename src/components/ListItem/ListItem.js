@@ -3,6 +3,7 @@ import { Text, View, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 
 import Header from './Header';
 import Content from './Content';
+import scaleAndOpacity from '../../animations/scaleAndOpacity';
 import { getPlatformElevation } from '../../utils';
 
 class ListItem extends PureComponent {
@@ -11,12 +12,8 @@ class ListItem extends PureComponent {
     onPress(item);
   };
   render() {
-    const { item, isHidden } = this.props;
+    const { item } = this.props;
     const { name, ...rest } = item;
-
-    if (isHidden) {
-      return null;
-    }
 
     return (
       <TouchableWithoutFeedback onPress={this.onPressed}>
@@ -36,8 +33,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 5,
-    ...getPlatformElevation(4),
+    ...getPlatformElevation(2),
   },
 });
 
-export default ListItem;
+export default scaleAndOpacity(ListItem);

@@ -10,7 +10,7 @@ class Toolbar extends PureComponent {
         <View style={styles.statusBar} />
         <TouchableWithoutFeedback onPress={onBackPress}>
           <View style={styles.toolbarContainer}>
-            <Text style={styles.titleText}>Back</Text>
+            <Text>Back</Text>
           </View>
         </TouchableWithoutFeedback>
       </View>
