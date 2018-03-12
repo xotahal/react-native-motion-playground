@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Toolbar } from './src/components';
 import List from './src/screens/List';
 import Detail from './src/screens/Detail';
+import Transform from './src/animations/Transform';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -29,19 +30,26 @@ export default class App extends React.Component {
   render() {
     const { item, position } = this.state;
 
-    let detailView = null;
+    let transformView = null;
+    let page = null;
 
     if (item) {
-      detailView = <Detail item={item} startPosition={position} />;
-    }
-    return (
-      <View style={styles.container}>
-        {detailView}
-        <Toolbar isDetail={!!item} onBackPress={this.onBackPressed} />
+      // transformView = <Transform item={item} startPosition={position} />;
+      page = <Detail item={item} />;
+    } else {
+      page = (
         <List
           selected={item && item.name}
           onShowDetailRequest={this.onShowDetailRequested}
         />
+      );
+    }
+
+    return (
+      <View style={styles.container}>
+        {transformView}
+        <Toolbar isDetail={!!item} onBackPress={this.onBackPressed} />
+        {page}
       </View>
     );
   }
