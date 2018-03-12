@@ -8,33 +8,37 @@ class List extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {
-      selected: null,
-    };
+    this.itemRefs = {};
   }
-  onListItemPressed = item => {
-    this.setState({ selected: item.name });
-  };
-  onBackPressed = () => {
-    this.setState({ selected: null });
-  };
+  onListItemPressed = (item, nativeEvent) => {
+    const { onShowDetailRequest } = this.props;
 
+    this.itemRefs[item.name].measure((x, y, width, height, pageX, pageY) => {
+      console.log(x, y, width, height, pageX, pageY);
+      onShowDetailRequest(item, { width, pageX, pageY });
+    });
+  };
   render() {
-    const { selected } = this.state;
+    const { selected } = this.props;
 
     return (
       <View style={styles.container}>
-        <Toolbar isDetail={!!selected} onBackPress={this.onBackPressed} />
         <FlatList
           data={data}
           dataExtra={selected}
           keyExtractor={item => item.name}
           renderItem={({ item }) => (
-            <ListItem
-              item={item}
-              onPress={this.onListItemPressed}
-              isHidden={selected && selected !== item.name}
-            />
+            <View
+              style={{ backgroundColor: 'transparent' }}
+              ref={c => (this.itemRefs[item.name] = c)}
+            >
+              <ListItem
+                item={item}
+                onPress={this.onListItemPressed}
+                isHidden={selected && selected !== item.name}
+                isSelected={selected === item.name}
+              />
+            </View>
           )}
         />
       </View>
