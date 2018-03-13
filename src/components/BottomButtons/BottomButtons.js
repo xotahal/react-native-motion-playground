@@ -8,22 +8,19 @@ import {
   Ionicons,
 } from '@expo/vector-icons';
 
-import Row from './Row';
-import { getPlatformElevation } from '../utils';
+import Button from './Button';
+import Row from '../Row';
+import { getPlatformElevation } from '../../utils';
 
 class BottomButtons extends PureComponent {
   render() {
     return (
       <Row style={styles.container}>
         <View style={styles.flexContainer}>
-          <View style={[styles.iconContainer, { backgroundColor: '#008dff' }]}>
-            <SimpleLineIcons name="present" size={24} color="white" />
-          </View>
+          <Button name="present" backgroundColor="#008dff" />
         </View>
         <View style={styles.flexContainer}>
-          <View style={[styles.iconContainer, { backgroundColor: '#ff2d4c' }]}>
-            <Entypo name="wallet" size={24} color="white" />
-          </View>
+          <Button name="wallet" backgroundColor="#ff2d4c" delay={125} />
         </View>
       </Row>
     );
@@ -42,13 +39,6 @@ const styles = StyleSheet.create({
   },
   flexContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },

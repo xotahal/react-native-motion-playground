@@ -4,7 +4,6 @@ import { Text, View, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import Header from './Header';
 import Content from './Content';
 import scaleAndOpacity from '../../animations/scaleAndOpacity';
-import translate from '../../animations/translate';
 import { getPlatformElevation } from '../../utils';
 
 class ListItem extends PureComponent {
