@@ -41,7 +41,7 @@ class List extends PureComponent {
             </View>
           )}
         />
-        <BottomBar />
+        <BottomBar isHidden={!!selected} />
       </View>
     );
   }
