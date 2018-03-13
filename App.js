@@ -65,9 +65,12 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container}>
+        <ToolbarBackground isDetail={item || detailItem} />
         {transformView}
-        <ToolbarBackground isDetail={!!detailItem} />
-        <Toolbar isDetail={!!detailItem} onBackPress={this.onBackPressed} />
+        <Toolbar
+          isDetail={item || detailItem}
+          onBackPress={this.onBackPressed}
+        />
         {page}
       </View>
     );
