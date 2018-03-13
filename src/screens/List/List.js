@@ -62,7 +62,7 @@ class List extends PureComponent {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

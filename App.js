@@ -62,8 +62,10 @@ export default class App extends React.Component {
   renderPage() {
     const { selectedItem, position, detailItem, phase } = this.state;
 
+    let detailPage = null;
+
     if (phase === 'phase-2' || phase === 'phase-3') {
-      return (
+      detailPage = (
         <Detail
           phase={phase}
           selectedItem={selectedItem}
@@ -74,11 +76,14 @@ export default class App extends React.Component {
     }
 
     return (
-      <List
-        selectedItem={selectedItem}
-        onItemPress={this.onItemPressed}
-        phase={phase}
-      />
+      <View style={{ flex: 1 }}>
+        <List
+          selectedItem={selectedItem}
+          onItemPress={this.onItemPressed}
+          phase={phase}
+        />
+        {detailPage}
+      </View>
     );
   }
   render() {

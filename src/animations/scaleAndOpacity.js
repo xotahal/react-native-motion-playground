@@ -1,15 +1,24 @@
 import React, { PureComponent } from 'react';
-import { Animated } from 'react-native';
+import { Animated, InteractionManager } from 'react-native';
 
 const scaleAndOpacity = Wrapped => {
   return class ScaleAndOpacity extends PureComponent {
     constructor(props) {
       super(props);
 
+      const { animateOnDidMount } = props;
+
       this.state = {
-        opacityValue: new Animated.Value(1),
-        scaleValue: new Animated.Value(1),
+        opacityValue: new Animated.Value(animateOnDidMount ? 0 : 1),
+        scaleValue: new Animated.Value(animateOnDidMount ? 0.8 : 1),
       };
+    }
+    componentDidMount() {
+      if (this.props.animateOnDidMount) {
+        InteractionManager.runAfterInteractions().then(() => {
+          this.showAnimation();
+        });
+      }
     }
     componentWillReceiveProps(nextProps) {
       if (!this.props.isHidden && nextProps.isHidden) {
@@ -35,8 +44,16 @@ const scaleAndOpacity = Wrapped => {
     };
     showAnimation = () => {
       Animated.parallel([
-        Animated.timing(this.state.scaleValue, { toValue: 1 }),
-        Animated.timing(this.state.opacityValue, { toValue: 1 }),
+        Animated.timing(this.state.scaleValue, {
+          toValue: 1,
+          useNativeDriver: true,
+          duration: 250,
+        }),
+        Animated.timing(this.state.opacityValue, {
+          toValue: 1,
+          useNativeDriver: true,
+          duration: 250,
+        }),
       ]).start();
     };
     render() {

@@ -40,7 +40,7 @@ class Detail extends PureComponent {
     const { onMoveBackAnimationEnd, startPosition } = this.props;
 
     Animated.timing(this.state.topValue, {
-      easing: Easing.out(Easing.back()),
+      easing: Easing.in(Easing.back()),
       toValue: startPosition.pageY,
       duration: 500,
       delay: 250,

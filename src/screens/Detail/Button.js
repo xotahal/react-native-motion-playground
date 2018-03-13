@@ -1,5 +1,11 @@
 import React from 'react';
-import { Animated, View, StyleSheet, InteractionManager } from 'react-native';
+import {
+  Animated,
+  Easing,
+  View,
+  StyleSheet,
+  InteractionManager,
+} from 'react-native';
 import { SimpleLineIcons } from '@expo/vector-icons';
 
 class Button extends React.PureComponent {
@@ -11,14 +17,28 @@ class Button extends React.PureComponent {
     };
   }
   componentDidMount() {
-    const { delay } = this.props;
-
     InteractionManager.runAfterInteractions().then(() => {
-      Animated.timing(this.state.translateY, { toValue: 0, delay }).start();
+      this.showAnimation(this.props);
     });
   }
-  componentWillUnmount() {
-    Animated.timing(this.state.translateY, { toValue: 112 }).start();
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.isHidden && nextProps.isHidden) {
+      this.hideAnimation(nextProps);
+    }
+  }
+  showAnimation(props) {
+    Animated.timing(this.state.translateY, {
+      easing: Easing.out(Easing.back()),
+      toValue: 0,
+      delay: props.delay,
+    }).start();
+  }
+  hideAnimation(props) {
+    Animated.timing(this.state.translateY, {
+      easing: Easing.in(Easing.back()),
+      toValue: 112,
+      delay: props.delay,
+    }).start();
   }
   render() {
     const { backgroundColor, name } = this.props;

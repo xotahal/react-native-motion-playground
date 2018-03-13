@@ -34,7 +34,7 @@ class Detail extends PureComponent {
         isHidden={phase === 'phase-3'}
         item={item}
         index={index}
-        delay={16 * delay}
+        delay={56 * delay}
       />
     );
   };
@@ -60,7 +60,7 @@ class Detail extends PureComponent {
           keyExtractor={item => item.amount}
           renderItem={this.renderItem}
         />
-        <BottomBar />
+        <BottomBar isHidden={phase === 'phase-3'} />
       </View>
     );
   }
