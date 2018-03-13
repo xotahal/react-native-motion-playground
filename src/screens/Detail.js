@@ -1,32 +1,27 @@
 import React, { PureComponent } from 'react';
-import { Animated, Text, View, FlatList, StyleSheet } from 'react-native';
+import {
+  InteractionManager,
+  Animated,
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 
-import { ListItem, Toolbar, Row, BottomButtons } from '../components';
+import {
+  ListItem,
+  Toolbar,
+  Row,
+  BottomButtons,
+  DetailListItem,
+} from '../components';
 import data from '../data/data';
 
 class Detail extends PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {};
-  }
-  renderItem = ({ item }) => {
-    return (
-      <View style={styles.itemContainer}>
-        <Row style={styles.rowContainer}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>{item.name}</Text>
-          </View>
-          <Text style={styles.amountText}>{item.amount}</Text>
-        </Row>
-        <Text style={styles.vatText}>
-          {`${item.amount} X1 (Including VAT 10%)`}
-        </Text>
-      </View>
-    );
+  renderItem = ({ item, index }) => {
+    return <DetailListItem item={item} delay={112 * index} />;
   };
   render() {
-    const { topValue } = this.state;
     const { item, startPosition } = this.props;
 
     return (
