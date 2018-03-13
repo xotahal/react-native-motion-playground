@@ -1,26 +1,20 @@
 import React, { PureComponent } from 'react';
-import {
-  Animated,
-  Text,
-  View,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import { Animated, View, StyleSheet, InteractionManager } from 'react-native';
 
 class ToolbarBackground extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
-      translateY: new Animated.Value(-150),
+      translateY: new Animated.Value(props.isHidden ? -150 : 0),
     };
   }
   componentWillReceiveProps(nextProps) {
-    if (!this.props.isDetail && nextProps.isDetail) {
-      this.showAnimation();
-    }
-    if (this.props.isDetail && !nextProps.isDetail) {
+    if (!this.props.isHidden && nextProps.isHidden) {
       this.hideAnimation();
+    }
+    if (this.props.isHidden && !nextProps.isHidden) {
+      this.showAnimation();
     }
   }
   hideAnimation() {

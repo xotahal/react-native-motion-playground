@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
+import Avatar from './Avatar';
 import Row from '../Row';
 import assets from '../../assets';
-import { Avatar } from '../../uikit';
 
 class Header extends PureComponent {
   render() {

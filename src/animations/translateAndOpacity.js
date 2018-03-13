@@ -16,6 +16,14 @@ const translateAndOpacity = Wrapped => {
         this.showAnimation();
       });
     }
+    componentWillReceiveProps(nextProps) {
+      if (!this.props.isHidden && nextProps.isHidden) {
+        this.hideAnimation(nextProps);
+      }
+      if (this.props.isHidden && !nextProps.isHidden) {
+        this.showAnimation(nextProps);
+      }
+    }
     showAnimation() {
       const { delay } = this.props;
 
@@ -33,6 +41,28 @@ const translateAndOpacity = Wrapped => {
           delay,
         }),
       ]).start();
+    }
+    hideAnimation(props) {
+      const { delay, onHideAnimationEnd } = props;
+
+      Animated.parallel([
+        Animated.timing(this.state.opacityValue, {
+          toValue: 0,
+          useNativeDriver: true,
+          duration: 500,
+          delay,
+        }),
+        Animated.timing(this.state.translateY, {
+          toValue: -4,
+          useNativeDriver: true,
+          duration: 500,
+          delay,
+        }),
+      ]).start(() => {
+        if (onHideAnimationEnd) {
+          onHideAnimationEnd(props);
+        }
+      });
     }
     render() {
       const { opacityValue, translateY } = this.state;

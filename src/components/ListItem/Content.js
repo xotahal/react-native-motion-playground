@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
 import Row from '../Row';
-import { Avatar } from '../../uikit';
 import { getPlatformElevation } from '../../utils';
 
 class Content extends PureComponent {

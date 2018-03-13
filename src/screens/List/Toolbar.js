@@ -8,60 +8,13 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons';
 
-import Row from './Row';
+import { Row } from '../../components';
+import translateAndOpacity from '../../animations/translateAndOpacity';
 
 class Toolbar extends PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isDetail: false,
-      translateY: new Animated.Value(0),
-      opacityValue: new Animated.Value(1),
-    };
-  }
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isDetail !== nextProps.isDetail) {
-      this.animate();
-    }
-  }
-  animate() {
-    Animated.parallel([
-      Animated.timing(this.state.opacityValue, {
-        toValue: 0,
-        useNativeDriver: true,
-        duration: 250,
-      }),
-      Animated.timing(this.state.translateY, {
-        toValue: -8,
-        useNativeDriver: true,
-        duration: 250,
-      }),
-    ]).start(() => {
-      this.setState({ isDetail: !this.state.isDetail });
-
-      Animated.parallel([
-        Animated.timing(this.state.opacityValue, {
-          toValue: 1,
-          useNativeDriver: true,
-          duration: 250,
-        }),
-        Animated.timing(this.state.translateY, {
-          toValue: 0,
-          useNativeDriver: true,
-          duration: 250,
-        }),
-      ]).start();
-    });
-  }
   renderDetail() {
     const { opacityValue, translateY } = this.state;
     const { onBackPress } = this.props;
-
-    const animationStyle = {
-      opacity: opacityValue,
-      transform: [{ translateY }],
-    };
 
     return (
       <View style={styles.container}>
@@ -83,21 +36,10 @@ class Toolbar extends PureComponent {
     );
   }
   render() {
-    const { isDetail, opacityValue, translateY } = this.state;
-
-    if (isDetail) {
-      return this.renderDetail();
-    }
-
-    const animationStyle = {
-      opacity: opacityValue,
-      transform: [{ translateY }],
-    };
-
     return (
       <View style={styles.container}>
         <View style={styles.statusBar} />
-        <Animated.View style={animationStyle}>
+        <View>
           <Row style={styles.toolbarContainer}>
             <View style={styles.titleContainer}>
               <Text style={styles.titleText}>My Checks</Text>
@@ -113,7 +55,7 @@ class Toolbar extends PureComponent {
               />
             </View>
           </Row>
-        </Animated.View>
+        </View>
       </View>
     );
   }
@@ -161,4 +103,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Toolbar;
+export default translateAndOpacity(Toolbar);

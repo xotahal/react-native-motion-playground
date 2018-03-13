@@ -9,7 +9,7 @@ import {
 } from '@expo/vector-icons';
 
 import Button from './Button';
-import Row from '../Row';
+import { Row } from '../../components';
 import { getPlatformElevation } from '../../utils';
 
 class BottomButtons extends PureComponent {

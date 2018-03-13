@@ -14,8 +14,8 @@ import {
   Ionicons,
 } from '@expo/vector-icons';
 
-import Row from './Row';
-import { getPlatformElevation } from '../utils';
+import { Row } from '../../components';
+import { getPlatformElevation } from '../../utils';
 
 class BottomBar extends PureComponent {
   constructor(props) {

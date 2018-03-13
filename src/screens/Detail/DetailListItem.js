@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import { Animated, Text, View, StyleSheet } from 'react-native';
 
-import Row from './Row';
-import translateAndOpacity from '../animations/translateAndOpacity';
+import { Row } from '../../components';
+import translateAndOpacity from '../../animations/translateAndOpacity';
 
 class DetailListItem extends PureComponent {
   render() {

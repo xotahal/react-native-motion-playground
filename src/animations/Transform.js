@@ -22,21 +22,36 @@ class Detail extends PureComponent {
   componentDidMount() {
     this.moveItemToTop();
   }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.phase !== 'phase-3' && nextProps.phase === 'phase-3') {
+      this.moveItemBack();
+    }
+  }
   moveItemToTop = () => {
-    const { onTransformEnd } = this.props;
+    const { onMoveDetailAnimationEnd } = this.props;
 
     Animated.timing(this.state.topValue, {
       easing: Easing.in(Easing.back()),
       toValue: 80,
       duration: 500,
-    }).start(onTransformEnd);
+    }).start(onMoveDetailAnimationEnd);
+  };
+  moveItemBack = () => {
+    const { onMoveBackAnimationEnd, startPosition } = this.props;
+
+    Animated.timing(this.state.topValue, {
+      easing: Easing.out(Easing.back()),
+      toValue: startPosition.pageY,
+      duration: 500,
+      delay: 250,
+    }).start(onMoveBackAnimationEnd);
   };
   onBackPressed = () => {
     this.setState({ selected: null });
   };
   render() {
     const { topValue } = this.state;
-    const { item, startPosition } = this.props;
+    const { selectedItem, startPosition } = this.props;
 
     return (
       <View style={styles.container}>
@@ -49,7 +64,7 @@ class Detail extends PureComponent {
             },
           ]}
         >
-          <ListItem item={item} onPress={() => {}} />
+          <ListItem item={selectedItem} onPress={() => {}} />
         </Animated.View>
       </View>
     );

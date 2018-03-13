@@ -1,9 +1,9 @@
 import React from 'react';
 import { InteractionManager, StyleSheet, Text, View } from 'react-native';
 
-import { Toolbar, ToolbarBackground } from './src/components';
-import List from './src/screens/List';
-import Detail from './src/screens/Detail';
+import List from './src/screens/List/List';
+import Detail from './src/screens/Detail/Detail';
+import ToolbarBackground from './src/screens/Detail/ToolbarBackground';
 import Transform from './src/animations/Transform';
 
 export default class App extends React.Component {
@@ -11,67 +11,108 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      item: null,
+      selectedItem: null,
       position: null,
+      // phase of animation
+      // phase-0:
+      // default
+      //
+      // phase-1:
+      // hide list toolbar, hide list bottom bar, show toolbar background and move item
+      //
+      // phase-2:
+      // show detail toolbar, show detail bottom bar, show details of item
+      //
+      // phase-3
+      // hide details of item
+      //
+      // phase-4
+      // hide detail toolbar, hide detail bootom bar, move item back to scrool view
+      phase: 'phase-0',
     };
   }
-  onShowDetailRequested = (item, position) => {
+  onItemPressed = (item, position) => {
     this.setState({
-      item,
+      phase: 'phase-1',
+      selectedItem: item,
       position,
     });
   };
   onBackPressed = () => {
     this.setState({
-      item: null,
-      position: null,
-      detailItem: null,
+      phase: 'phase-3',
     });
   };
-  onTransformEnded = () => {
+  onGoDetailAnimationEnded = () => {
     InteractionManager.runAfterInteractions(() => {
       this.setState({
-        item: null,
-        detailItem: this.state.item,
+        phase: 'phase-2',
       });
     });
   };
-  render() {
-    const { item, position, detailItem } = this.state;
+  onMoveBackAnimationEnded = () => {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({
+        selectedItem: null,
+        position: null,
+        phase: 'phase-0',
+      });
+    });
+  };
+  renderPage() {
+    const { selectedItem, position, detailItem, phase } = this.state;
 
-    let transformView = null;
-    let page = null;
-
-    if (item || detailItem) {
-      transformView = (
-        <Transform
-          item={item || detailItem}
-          startPosition={position}
-          onTransformEnd={this.onTransformEnded}
+    if (phase === 'phase-2' || phase === 'phase-3') {
+      return (
+        <Detail
+          phase={phase}
+          selectedItem={selectedItem}
+          onBackPress={this.onBackPressed}
+          onDetailAnimationEnd={this.onDetailAnimationEnded}
         />
       );
     }
 
-    if (detailItem) {
-      page = <Detail item={detailItem} />;
-    } else {
-      page = (
-        <List
-          selected={item && item.name}
-          onShowDetailRequest={this.onShowDetailRequested}
+    return (
+      <List
+        selectedItem={selectedItem}
+        onItemPress={this.onItemPressed}
+        phase={phase}
+      />
+    );
+  }
+  render() {
+    const {
+      selectedItem,
+      goToDetail,
+      position,
+      detailItem,
+      goBackRequested,
+      phase,
+    } = this.state;
+
+    let transformView = null;
+
+    if (selectedItem) {
+      transformView = (
+        <Transform
+          phase={phase}
+          selectedItem={selectedItem}
+          startPosition={position}
+          onMoveDetailAnimationEnd={this.onGoDetailAnimationEnded}
+          onMoveBackAnimationEnd={this.onMoveBackAnimationEnded}
+          goBackRequested={goBackRequested}
         />
       );
     }
 
     return (
       <View style={styles.container}>
-        <ToolbarBackground isDetail={item || detailItem} />
-        {transformView}
-        <Toolbar
-          isDetail={item || detailItem}
-          onBackPress={this.onBackPressed}
+        <ToolbarBackground
+          isHidden={phase !== 'phase-1' && phase !== 'phase-2'}
         />
-        {page}
+        {transformView}
+        {this.renderPage()}
       </View>
     );
   }
