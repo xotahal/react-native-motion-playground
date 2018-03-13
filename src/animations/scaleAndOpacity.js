@@ -21,8 +21,16 @@ const scaleAndOpacity = Wrapped => {
     }
     hideAnimation = () => {
       Animated.parallel([
-        Animated.timing(this.state.scaleValue, { toValue: 0.8 }),
-        Animated.timing(this.state.opacityValue, { toValue: 0 }),
+        Animated.timing(this.state.scaleValue, {
+          toValue: 0.8,
+          useNativeDriver: true,
+          duration: 250,
+        }),
+        Animated.timing(this.state.opacityValue, {
+          toValue: 0,
+          useNativeDriver: true,
+          duration: 250,
+        }),
       ]).start();
     };
     showAnimation = () => {

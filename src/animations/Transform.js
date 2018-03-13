@@ -1,5 +1,12 @@
 import React, { PureComponent } from 'react';
-import { Animated, Text, View, FlatList, StyleSheet } from 'react-native';
+import {
+  Easing,
+  Animated,
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 
 import { ListItem, Toolbar } from '../components';
 import data from '../data/data';
@@ -16,7 +23,13 @@ class Detail extends PureComponent {
     this.moveItemToTop();
   }
   moveItemToTop = () => {
-    Animated.timing(this.state.topValue, { toValue: 150 }).start();
+    const { onTransformEnd } = this.props;
+
+    Animated.timing(this.state.topValue, {
+      easing: Easing.in(Easing.back()),
+      toValue: 80,
+      duration: 500,
+    }).start(onTransformEnd);
   };
   onBackPressed = () => {
     this.setState({ selected: null });

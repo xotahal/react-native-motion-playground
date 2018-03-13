@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { InteractionManager, StyleSheet, Text, View } from 'react-native';
 
 import { Toolbar, ToolbarBackground } from './src/components';
 import List from './src/screens/List';
@@ -25,17 +25,35 @@ export default class App extends React.Component {
     this.setState({
       item: null,
       position: null,
+      detailItem: null,
+    });
+  };
+  onTransformEnded = () => {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({
+        item: null,
+        detailItem: this.state.item,
+      });
     });
   };
   render() {
-    const { item, position } = this.state;
+    const { item, position, detailItem } = this.state;
 
     let transformView = null;
     let page = null;
 
-    if (item) {
-      // transformView = <Transform item={item} startPosition={position} />;
-      page = <Detail item={item} />;
+    if (item || detailItem) {
+      transformView = (
+        <Transform
+          item={item || detailItem}
+          startPosition={position}
+          onTransformEnd={this.onTransformEnded}
+        />
+      );
+    }
+
+    if (detailItem) {
+      page = <Detail item={detailItem} />;
     } else {
       page = (
         <List
@@ -48,8 +66,8 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         {transformView}
-        <ToolbarBackground isDetail={!!item} />
-        <Toolbar isDetail={!!item} onBackPress={this.onBackPressed} />
+        <ToolbarBackground isDetail={!!detailItem} />
+        <Toolbar isDetail={!!detailItem} onBackPress={this.onBackPressed} />
         {page}
       </View>
     );

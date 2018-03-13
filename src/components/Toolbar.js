@@ -11,7 +11,6 @@ class Toolbar extends PureComponent {
     return (
       <View style={styles.container}>
         <View style={styles.statusBar} />
-        <View style={styles.toolbarBackground} />
         <TouchableWithoutFeedback onPress={onBackPress}>
           <View>
             <Row style={styles.toolbarContainer}>
