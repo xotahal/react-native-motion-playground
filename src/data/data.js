@@ -5,7 +5,7 @@ const data = [
     name: 'Hermes',
     amount: '$1,500.67',
     date: moment(),
-    isReceived: true,
+    isReceived: false,
     items: [
       {
         name: 'Lather moto jacket',
@@ -77,7 +77,7 @@ const data = [
     name: 'Kenzo',
     amount: '$375.37',
     date: moment(),
-    isReceived: true,
+    isReceived: false,
     items: [
       {
         name: 'Lather moto jacket',

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 
-import { ListItem, Toolbar } from '../components';
+import { ListItem, Toolbar, BottomBar } from '../components';
 import data from '../data/data';
 
 class List extends PureComponent {
@@ -41,6 +41,7 @@ class List extends PureComponent {
             </View>
           )}
         />
+        <BottomBar />
       </View>
     );
   }

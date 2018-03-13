@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Toolbar } from './src/components';
+import { Toolbar, ToolbarBackground } from './src/components';
 import List from './src/screens/List';
 import Detail from './src/screens/Detail';
 import Transform from './src/animations/Transform';
@@ -48,6 +48,7 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         {transformView}
+        <ToolbarBackground isDetail={!!item} />
         <Toolbar isDetail={!!item} onBackPress={this.onBackPressed} />
         {page}
       </View>

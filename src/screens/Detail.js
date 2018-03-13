@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Animated, Text, View, FlatList, StyleSheet } from 'react-native';
 
-import { ListItem, Toolbar, Row } from '../components';
+import { ListItem, Toolbar, Row, BottomButtons } from '../components';
 import data from '../data/data';
 
 class Detail extends PureComponent {
@@ -31,13 +31,13 @@ class Detail extends PureComponent {
 
     return (
       <View style={styles.container}>
-        <View style={styles.toolbarBackground} />
         <ListItem item={item} onPress={() => {}} />
         <FlatList
           data={item.items}
           keyExtractor={item => item.amount}
           renderItem={this.renderItem}
         />
+        <BottomButtons />
       </View>
     );
   }
@@ -46,14 +46,7 @@ class Detail extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
-  },
-  toolbarBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 150,
-    // backgroundColor: 'blue',
+    flex: 1,
   },
   titleContainer: {
     flex: 1,

@@ -1,22 +1,30 @@
 import React, { PureComponent } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
 import Row from '../Row';
+import assets from '../../assets';
 import { Avatar } from '../../uikit';
 
 class Header extends PureComponent {
   render() {
-    const { name } = this.props;
+    const { name, isReceived } = this.props;
+
+    let icon = null;
+
+    if (isReceived) {
+      icon = <Ionicons name="md-checkbox" size={24} color="#008dff" />;
+    } else {
+      icon = <MaterialIcons name="warning" size={24} color="#ff2d4c" />;
+    }
 
     return (
       <Row style={styles.container}>
-        <Avatar text={name.substring(0, 1)} />
+        <Avatar text={name.substring(0, 1)} src={assets[name]} />
         <View style={styles.nameContainer}>
           <Text>{name}</Text>
         </View>
-        <View style={styles.rightContainer}>
-          <Text>Icon</Text>
-        </View>
+        <View style={styles.rightContainer}>{icon}</View>
       </Row>
     );
   }
@@ -34,6 +42,8 @@ const styles = StyleSheet.create({
   rightContainer: {
     width: 48,
     height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
