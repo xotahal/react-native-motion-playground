@@ -27,6 +27,16 @@ class SharedElementRenderer extends PureComponent {
       config: null,
     };
   }
+  onMoveCompleted = () => {
+    const { config } = this.state;
+    const { onMoveComplete } = config || {};
+
+    if (onMoveComplete) {
+      onMoveComplete();
+    }
+
+    this.setState({ config: null });
+  };
   // This method will compute animations. Position and scale.
   getAnimations = config => {
     const { sourcePosition, destinationPosition, ...rest } = config;
@@ -38,7 +48,7 @@ class SharedElementRenderer extends PureComponent {
 
       animations.push(
         Animated.timing(this.state.topValue, {
-          toValue: destinationPosition.pageY,
+          toValue: destinationPosition.pageY + 100,
           ...rest,
         })
       );
@@ -81,7 +91,7 @@ class SharedElementRenderer extends PureComponent {
     });
 
     setTimeout(() => {
-      Animated.parallel(animations).start(onMoveComplete);
+      Animated.parallel(animations).start(this.onMoveCompleted);
     }, 0);
   };
   renderSharedElement() {

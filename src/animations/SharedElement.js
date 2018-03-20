@@ -31,8 +31,16 @@ class SharedElement extends PureComponent {
     }
 
     this.state = {
-      startPosition: null,
+      destinationOpacity: 0,
     };
+  }
+  componentDidMount() {
+    const { sourceId, children } = this.props;
+    // destination component
+    if (sourceId) {
+      // we will animate this node
+      elements[sourceId].node = React.cloneElement(children);
+    }
   }
   storeRef = node => {
     const { id, sourceId, children } = this.props;
@@ -51,40 +59,71 @@ class SharedElement extends PureComponent {
       ref(node);
     }
   };
-  onLayout = data => {
-    const { moveSharedElement } = this.context;
-    const { children, id, sourceId } = this.props;
-    const key = id || sourceId;
+  onMoveCompleted = () => {
+    const { onMoveComplete } = this.props;
 
-    if (key) {
-      const { sourceRef, destinationRef } = elements[key];
-      const ref = sourceRef || destinationRef;
+    this.setState({
+      destinationOpacity: 1,
+    });
 
-      if (ref) {
-        ref.measure((x, y, width, height, pageX, pageY) => {
-          const position = {
-            x,
-            y,
-            width,
-            height,
-            pageX,
-            pageY,
-          };
-
-          if (sourceRef) {
-            elements[key].sourcePosition = position;
-          } else if (destinationRef) {
-            elements[key].destinationPosition = position;
-
-            moveSharedElement({
-              ...elements[key],
-              ...this.props,
-              node: children,
-            });
-          }
-        });
-      }
+    if (onMoveComplete) {
+      onMoveComplete();
     }
+  };
+  onSourceLayout = data => {
+    const { children, id } = this.props;
+
+    const { sourceRef } = elements[id];
+
+    if (sourceRef) {
+      sourceRef.measure((x, y, width, height, pageX, pageY) => {
+        const position = { x, y, width, height, pageX, pageY };
+        elements[id].sourcePosition = position;
+      });
+    }
+
+    // Call original if any
+    const { onLayout } = children;
+    if (typeof onLayout === 'function') {
+      onLayout(data);
+    }
+  };
+  onDestinationLayout = data => {
+    const { moveSharedElement } = this.context;
+    const { children, sourceId, onMoveComplete, ...rest } = this.props;
+
+    const { sourceRef, destinationRef } = elements[sourceId];
+
+    if (sourceRef) {
+      sourceRef.measure((x, y, width, height, pageX, pageY) => {
+        const position = { x, y, width, height, pageX, pageY };
+        elements[sourceId].sourcePosition = position;
+
+        destinationRef.measure((x, y, width, height, pageX, pageY) => {
+          const position = { x, y, width, height, pageX, pageY };
+          elements[sourceId].destinationPosition = position;
+
+          moveSharedElement({
+            ...elements[sourceId],
+            ...rest,
+            onMoveComplete: this.onMoveCompleted,
+          });
+
+          sourceRef.setNativeProps({ opacity: 0 });
+        });
+      });
+    }
+
+    destinationRef.measure((x, y, width, height, pageX, pageY) => {
+      const position = { x, y, width, height, pageX, pageY };
+      elements[sourceId].destinationPosition = position;
+
+      moveSharedElement({
+        ...elements[sourceId],
+        ...rest,
+        onMoveComplete: this.onMoveCompleted,
+      });
+    });
 
     // Call original if any
     const { onLayout } = children;
@@ -97,20 +136,18 @@ class SharedElement extends PureComponent {
 
     return React.cloneElement(this.props.children, {
       ref: this.storeRef,
-      onLayout: this.onLayout,
+      onLayout: this.onSourceLayout,
     });
   }
   renderDestination() {
     const { children } = this.props;
-    const { sourcePosition, topValue } = this.state;
+    const { sourcePosition, topValue, destinationOpacity } = this.state;
     const { height, width } = sourcePosition || {};
 
     return React.cloneElement(children, {
       ref: this.storeRef,
-      onLayout: this.onLayout,
-      style: {
-        opacity: 0.2,
-      },
+      onLayout: this.onDestinationLayout,
+      style: { opacity: destinationOpacity },
     });
   }
   render() {

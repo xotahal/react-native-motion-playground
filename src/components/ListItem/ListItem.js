@@ -12,18 +12,22 @@ class ListItem extends PureComponent {
     onPress(item, event.nativeEvent);
   };
   render() {
-    const { item, isSelected, style, isHidden } = this.props;
+    const { item, isSelected, style, isHidden, animateOnDidMount } = this.props;
     const { name, isReceived, ...rest } = item;
 
     return (
-      // <ScaleAndOpacity isHidden={isHidden} duration={250}>
-      <TouchableWithoutFeedback onPress={this.onPressed}>
-        <View style={[styles.container, style]} pointerEvents="box-only">
-          <Header name={name} isReceived={isReceived} />
-          <Content {...rest} />
-        </View>
-      </TouchableWithoutFeedback>
-      // </ScaleAndOpacity>
+      <ScaleAndOpacity
+        isHidden={isHidden}
+        duration={250}
+        animateOnDidMount={animateOnDidMount}
+      >
+        <TouchableWithoutFeedback onPress={this.onPressed}>
+          <View style={[styles.container, style]} pointerEvents="box-only">
+            <Header name={name} isReceived={isReceived} />
+            <Content {...rest} />
+          </View>
+        </TouchableWithoutFeedback>
+      </ScaleAndOpacity>
     );
   }
 }

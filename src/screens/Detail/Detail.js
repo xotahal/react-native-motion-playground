@@ -55,7 +55,13 @@ class Detail extends PureComponent {
     );
   };
   render() {
-    const { selectedItem, startPosition, phase, onBackPress } = this.props;
+    const {
+      selectedItem,
+      startPosition,
+      phase,
+      onBackPress,
+      onSharedElementMoved,
+    } = this.props;
     const { items = [] } = selectedItem || {};
 
     if (!selectedItem) {
@@ -68,13 +74,15 @@ class Detail extends PureComponent {
         <SharedElement
           sourceId={selectedItem.name}
           easing={Easing.in(Easing.back())}
-          duration={250}
+          duration={1000}
+          onMoveComplete={onSharedElementMoved}
         >
           <View style={{ backgroundColor: 'transparent' }}>
             <ListItem
               item={selectedItem}
               onPress={() => {}}
               animateOnDidMount={false}
+              isHidden={false}
             />
           </View>
         </SharedElement>

@@ -35,7 +35,6 @@ class List extends PureComponent {
             item={item}
             onPress={this.onListItemPressed}
             isHidden={isHidden}
-            isSelected={isSelected}
           />
         </View>
       </SharedElement>

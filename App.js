@@ -13,7 +13,6 @@ export default class App extends React.Component {
 
     this.state = {
       selectedItem: null,
-      position: null,
       // phase of animation
       // phase-0:
       // default
@@ -32,11 +31,10 @@ export default class App extends React.Component {
       phase: 'phase-0',
     };
   }
-  onItemPressed = (item, position) => {
+  onItemPressed = item => {
     this.setState({
       phase: 'phase-1',
       selectedItem: item,
-      position,
     });
   };
   onBackPressed = () => {
@@ -45,7 +43,7 @@ export default class App extends React.Component {
       selectedItem: null,
     });
   };
-  onGoDetailAnimationEnded = () => {
+  onSharedElementMoved = () => {
     InteractionManager.runAfterInteractions(() => {
       this.setState({
         phase: 'phase-2',
@@ -67,22 +65,25 @@ export default class App extends React.Component {
     let detailPage = null;
 
     if (selectedItem) {
-      return (
+      detailPage = (
         <Detail
           phase={phase}
           selectedItem={selectedItem}
           onBackPress={this.onBackPressed}
-          onDetailAnimationEnd={this.onDetailAnimationEnded}
+          onSharedElementMoved={this.onSharedElementMoved}
         />
       );
     }
 
     return (
-      <List
-        selectedItem={selectedItem}
-        onItemPress={this.onItemPressed}
-        phase={phase}
-      />
+      <View style={{ flex: 1 }}>
+        <List
+          selectedItem={selectedItem}
+          onItemPress={this.onItemPressed}
+          phase={phase}
+        />
+        {detailPage}
+      </View>
     );
   }
   render() {
@@ -111,6 +112,5 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
 });
