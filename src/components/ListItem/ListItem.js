@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react';
 import { Text, View, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import { ScaleAndOpacity } from 'react-native-motion';
 
 import Header from './Header';
 import Content from './Content';
-import scaleAndOpacity from '../../animations/scaleAndOpacity';
 import { getPlatformElevation } from '../../utils';
 
 class ListItem extends PureComponent {
@@ -12,19 +12,18 @@ class ListItem extends PureComponent {
     onPress(item, event.nativeEvent);
   };
   render() {
-    const { item, isSelected } = this.props;
+    const { item, isSelected, style, isHidden } = this.props;
     const { name, isReceived, ...rest } = item;
 
     return (
+      // <ScaleAndOpacity isHidden={isHidden} duration={250}>
       <TouchableWithoutFeedback onPress={this.onPressed}>
-        <View
-          style={[styles.container, { opacity: isSelected ? 0 : 1 }]}
-          pointerEvents="box-only"
-        >
+        <View style={[styles.container, style]} pointerEvents="box-only">
           <Header name={name} isReceived={isReceived} />
           <Content {...rest} />
         </View>
       </TouchableWithoutFeedback>
+      // </ScaleAndOpacity>
     );
   }
 }
@@ -41,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default scaleAndOpacity(ListItem);
+export default ListItem;

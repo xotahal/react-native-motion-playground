@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
+  Easing,
   InteractionManager,
   Animated,
   Text,
@@ -8,11 +9,13 @@ import {
   StyleSheet,
 } from 'react-native';
 
+import { TranslateYAndOpacity } from 'react-native-motion';
+import SharedElement from '../../animations/SharedElement';
+
 import data from '../../data/data';
 import { ListItem, Row } from '../../components';
 import Toolbar from './Toolbar';
 import BottomBar from './BottomBar';
-import DetailListItem from './DetailListItem';
 
 class Detail extends PureComponent {
   onHideAnimationEnded = ({ index }) => {
@@ -29,13 +32,26 @@ class Detail extends PureComponent {
       delay = selectedItem.items.length - index;
     }
 
+    delay = 56 * delay;
+
     return (
-      <DetailListItem
+      <TranslateYAndOpacity
         isHidden={phase === 'phase-3'}
-        item={item}
-        index={index}
+        duration={250}
         delay={56 * delay}
-      />
+      >
+        <View style={styles.itemContainer}>
+          <Row style={styles.rowContainer}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}>{item.name}</Text>
+            </View>
+            <Text style={styles.amountText}>{item.amount}</Text>
+          </Row>
+          <Text style={styles.vatText}>
+            {`${item.amount} X1 (Including VAT 10%)`}
+          </Text>
+        </View>
+      </TranslateYAndOpacity>
     );
   };
   render() {
@@ -49,18 +65,26 @@ class Detail extends PureComponent {
     return (
       <View style={styles.container}>
         <Toolbar isHidden={phase === 'phase-3'} onBackPress={onBackPress} />
-        <ListItem
-          item={selectedItem}
-          isSelected={phase === 'phase-3'}
-          onPress={() => {}}
-        />
-        <FlatList
+        <SharedElement
+          sourceId={selectedItem.name}
+          easing={Easing.in(Easing.back())}
+          duration={250}
+        >
+          <View style={{ backgroundColor: 'transparent' }}>
+            <ListItem
+              item={selectedItem}
+              onPress={() => {}}
+              animateOnDidMount={false}
+            />
+          </View>
+        </SharedElement>
+        {/* <FlatList
           data={items}
           dataExtra={phase}
           keyExtractor={item => item.amount}
           renderItem={this.renderItem}
         />
-        <BottomBar isHidden={phase === 'phase-3'} />
+        <BottomBar isHidden={phase === 'phase-3'} /> */}
       </View>
     );
   }

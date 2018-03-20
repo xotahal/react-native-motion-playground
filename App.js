@@ -1,6 +1,7 @@
 import React from 'react';
 import { InteractionManager, StyleSheet, Text, View } from 'react-native';
 
+import SharedElementRenderer from './src/animations/SharedElementRenderer';
 import List from './src/screens/List/List';
 import Detail from './src/screens/Detail/Detail';
 import ToolbarBackground from './src/screens/Detail/ToolbarBackground';
@@ -41,6 +42,7 @@ export default class App extends React.Component {
   onBackPressed = () => {
     this.setState({
       phase: 'phase-3',
+      selectedItem: null,
     });
   };
   onGoDetailAnimationEnded = () => {
@@ -64,8 +66,8 @@ export default class App extends React.Component {
 
     let detailPage = null;
 
-    if (phase === 'phase-2' || phase === 'phase-3') {
-      detailPage = (
+    if (selectedItem) {
+      return (
         <Detail
           phase={phase}
           selectedItem={selectedItem}
@@ -76,14 +78,11 @@ export default class App extends React.Component {
     }
 
     return (
-      <View style={{ flex: 1 }}>
-        <List
-          selectedItem={selectedItem}
-          onItemPress={this.onItemPressed}
-          phase={phase}
-        />
-        {detailPage}
-      </View>
+      <List
+        selectedItem={selectedItem}
+        onItemPress={this.onItemPressed}
+        phase={phase}
+      />
     );
   }
   render() {
@@ -96,29 +95,15 @@ export default class App extends React.Component {
       phase,
     } = this.state;
 
-    let transformView = null;
-
-    if (selectedItem) {
-      transformView = (
-        <Transform
-          phase={phase}
-          selectedItem={selectedItem}
-          startPosition={position}
-          onMoveDetailAnimationEnd={this.onGoDetailAnimationEnded}
-          onMoveBackAnimationEnd={this.onMoveBackAnimationEnded}
-          goBackRequested={goBackRequested}
-        />
-      );
-    }
-
     return (
-      <View style={styles.container}>
-        <ToolbarBackground
-          isHidden={phase !== 'phase-1' && phase !== 'phase-2'}
-        />
-        {transformView}
-        {this.renderPage()}
-      </View>
+      <SharedElementRenderer>
+        <View style={styles.container}>
+          <ToolbarBackground
+            isHidden={phase !== 'phase-1' && phase !== 'phase-2'}
+          />
+          {this.renderPage()}
+        </View>
+      </SharedElementRenderer>
     );
   }
 }

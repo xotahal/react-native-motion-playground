@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react';
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 
+import SharedElement from '../../animations/SharedElement';
+
 import Toolbar from './Toolbar';
 import BottomBar from './BottomBar';
 import { ListItem } from '../../components';
@@ -12,12 +14,13 @@ class List extends PureComponent {
 
     this.itemRefs = {};
   }
-  onListItemPressed = (item, nativeEvent) => {
+  onListItemPressed = item => {
     const { onItemPress } = this.props;
+    onItemPress(item);
 
-    this.itemRefs[item.name].measure((x, y, width, height, pageX, pageY) => {
-      onItemPress(item, { width, pageX, pageY });
-    });
+    // this.itemRefs[item.name].measure((x, y, width, height, pageX, pageY) => {
+    //   onItemPress(item, { width, pageX, pageY });
+    // });
   };
   renderItem = ({ item }) => {
     const { selectedItem } = this.props;
@@ -26,17 +29,16 @@ class List extends PureComponent {
     const isSelected = selectedItem && selectedItem.name === item.name;
 
     return (
-      <View
-        style={{ backgroundColor: 'transparent' }}
-        ref={c => (this.itemRefs[item.name] = c)}
-      >
-        <ListItem
-          item={item}
-          onPress={this.onListItemPressed}
-          isHidden={isHidden}
-          isSelected={isSelected}
-        />
-      </View>
+      <SharedElement id={item.name}>
+        <View style={{ backgroundColor: 'transparent' }}>
+          <ListItem
+            item={item}
+            onPress={this.onListItemPressed}
+            isHidden={isHidden}
+            isSelected={isSelected}
+          />
+        </View>
+      </SharedElement>
     );
   };
   render() {
