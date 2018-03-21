@@ -74,30 +74,6 @@ class SharedElementRenderer extends PureComponent {
         })
       );
     }
-    // if (sourcePosition.pageX !== destinationPosition.pageX) {
-    //   this.setState({
-    //     translateXValue: new Animated.Value(sourcePosition.pageX),
-    //   });
-    //
-    //   animations.push(
-    //     Animated.timing(this.state.translateXValue, {
-    //       toValue: destinationPosition.pageX,
-    //       useNativeDriver: true,
-    //       ...rest,
-    //     })
-    //   );
-    // }
-    // if (sourcePosition.width !== destinationPosition.width) {
-    //   this.setState({ scaleValue: new Animated.Value(1) });
-    //
-    //   animations.push(
-    //     Animated.timing(this.state.scaleValue, {
-    //       toValue: sourcePosition.width / destinationPosition.width,
-    //       useNativeDriver: true,
-    //       ...rest,
-    //     })
-    //   );
-    // }
 
     return animations;
   };
@@ -120,7 +96,7 @@ class SharedElementRenderer extends PureComponent {
     }, 0);
   };
   renderSharedElement() {
-    const { config, translateYValue, translateXValue, scaleValue } = this.state;
+    const { config, translateYValue } = this.state;
     const { element } = config || {};
     const { source, node } = element || {};
     const { position } = source || {};
@@ -135,12 +111,6 @@ class SharedElementRenderer extends PureComponent {
     if (translateYValue) {
       transform.push({ translateY: translateYValue });
     }
-    // if (translateXValue) {
-    //   transform.push({ translateX: translateXValue });
-    // }
-    // if (scaleValue) {
-    //   transform.push({ scale: scaleValue });
-    // }
 
     const animatedStyle = {
       height,

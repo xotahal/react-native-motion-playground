@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import { TranslateYAndOpacity } from 'react-native-motion';
+import TranslateYAndOpacity from '../../animations/TranslateYAndOpacity';
 import SharedElement from '../../animations/SharedElement';
 
 import data from '../../data/data';
@@ -46,10 +46,8 @@ class Detail extends PureComponent {
       delay = selectedItem.items.length - index;
     }
 
-    delay = 56 * delay;
-
     return (
-      <TranslateYAndOpacity isHidden={phase === 'phase-3'} delay={56 * delay}>
+      <TranslateYAndOpacity isHidden={phase !== 'phase-2'} delay={56 * delay}>
         <View style={styles.itemContainer}>
           <Row style={styles.rowContainer}>
             <View style={styles.titleContainer}>
@@ -105,12 +103,12 @@ class Detail extends PureComponent {
             />
           </View>
         </SharedElement>
-        {/* <FlatList
+        <FlatList
           data={items}
           dataExtra={phase}
           keyExtractor={item => item.amount}
           renderItem={this.renderItem}
-        /> */}
+        />
         <BottomBar isHidden={phase === 'phase-3'} />
       </View>
     );
