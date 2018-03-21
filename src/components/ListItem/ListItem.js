@@ -18,7 +18,6 @@ class ListItem extends PureComponent {
     return (
       <ScaleAndOpacity
         isHidden={isHidden}
-        duration={250}
         animateOnDidMount={animateOnDidMount}
       >
         <TouchableWithoutFeedback onPress={this.onPressed}>

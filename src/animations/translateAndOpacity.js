@@ -31,13 +31,11 @@ const translateAndOpacity = Wrapped => {
         Animated.timing(this.state.opacityValue, {
           toValue: 1,
           useNativeDriver: true,
-          duration: 250,
           delay,
         }),
         Animated.timing(this.state.translateY, {
           toValue: 0,
           useNativeDriver: true,
-          duration: 250,
           delay,
         }),
       ]).start();
@@ -49,13 +47,11 @@ const translateAndOpacity = Wrapped => {
         Animated.timing(this.state.opacityValue, {
           toValue: 0,
           useNativeDriver: true,
-          duration: 250,
           delay,
         }),
         Animated.timing(this.state.translateY, {
           toValue: -4,
           useNativeDriver: true,
-          duration: 250,
           delay,
         }),
       ]).start(() => {

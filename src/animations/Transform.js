@@ -43,7 +43,6 @@ class Detail extends PureComponent {
       easing: Easing.in(Easing.back()),
       toValue: startPosition.pageY,
       duration: 500,
-      delay: 250,
     }).start(onMoveBackAnimationEnd);
   };
   onBackPressed = () => {

@@ -18,15 +18,24 @@ import Toolbar from './Toolbar';
 import BottomBar from './BottomBar';
 
 class Detail extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      opacityOfDestinationItem: 0,
+    };
+  }
   componentWillReceiveProps(nextProps) {
     if (this.props.phase === 'phase-2' && nextProps.phase === 'phase-3') {
       this.sharedElementRef.moveToSource();
     }
   }
-  onHideAnimationEnded = ({ index }) => {
-    if (index === 0) {
-      this.props.onDetailAnimationEnd();
-    }
+  onMoveToDestinationDidComplete = () => {
+    this.setState({ opacityOfDestinationItem: 1 });
+    this.props.onSharedElementMovedToDestination();
+  };
+  onMoveToSourceWillStart = () => {
+    this.setState({ opacityOfDestinationItem: 0 });
   };
   renderItem = ({ item, index }) => {
     const { phase, selectedItem } = this.props;
@@ -40,11 +49,7 @@ class Detail extends PureComponent {
     delay = 56 * delay;
 
     return (
-      <TranslateYAndOpacity
-        isHidden={phase === 'phase-3'}
-        duration={250}
-        delay={56 * delay}
-      >
+      <TranslateYAndOpacity isHidden={phase === 'phase-3'} delay={56 * delay}>
         <View style={styles.itemContainer}>
           <Row style={styles.rowContainer}>
             <View style={styles.titleContainer}>
@@ -65,8 +70,10 @@ class Detail extends PureComponent {
       startPosition,
       phase,
       onBackPress,
-      onSharedElementMovedToDestination,
+      onSharedElementMovedToSource,
     } = this.props;
+    const { opacityOfDestinationItem } = this.state;
+
     const { items = [] } = selectedItem || {};
 
     if (!selectedItem) {
@@ -80,10 +87,16 @@ class Detail extends PureComponent {
           ref={node => (this.sharedElementRef = node)}
           sourceId={selectedItem.name}
           easing={Easing.in(Easing.back())}
-          duration={500}
-          onMoveToDestinationDidComplete={onSharedElementMovedToDestination}
+          onMoveToDestinationDidComplete={this.onMoveToDestinationDidComplete}
+          onMoveToSourceWillStart={this.onMoveToSourceWillStart}
+          onMoveToSourceDidComplete={onSharedElementMovedToSource}
         >
-          <View style={{ backgroundColor: 'transparent' }}>
+          <View
+            style={{
+              opacity: opacityOfDestinationItem,
+              backgroundColor: 'transparent',
+            }}
+          >
             <ListItem
               item={selectedItem}
               onPress={() => {}}
@@ -97,8 +110,8 @@ class Detail extends PureComponent {
           dataExtra={phase}
           keyExtractor={item => item.amount}
           renderItem={this.renderItem}
-        />
-        <BottomBar isHidden={phase === 'phase-3'} /> */}
+        /> */}
+        <BottomBar isHidden={phase === 'phase-3'} />
       </View>
     );
   }

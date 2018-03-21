@@ -67,11 +67,18 @@ const setRef = (props, node) => {
   }
 };
 const setNode = props => {
-  // create a record in elements
-  if (isDestination(props)) {
-    const { sourceId, children } = props;
+  const key = getKey(props);
+
+  // if we already have a node
+  if (elements[key].node) {
+    return;
+  }
+
+  if (props.getNode) {
+    elements[key].node = props.getNode(props);
+  } else {
     // this node will be animated
-    elements[sourceId].node = React.cloneElement(children);
+    elements[key].node = React.cloneElement(props.children);
   }
 };
 const setSourcePosition = (props, position) => {
@@ -146,7 +153,6 @@ class SharedElement extends PureComponent {
   }
   componentDidMount() {
     setProps(this.props);
-    setNode(this.props);
   }
   componentWillReceiveProps(nextProps) {
     setProps(nextProps);
@@ -182,6 +188,8 @@ class SharedElement extends PureComponent {
   };
   moveToDestination = () => {
     const { moveSharedElement } = this.context;
+
+    setNode(this.props);
     const element = getElement(this.props);
 
     if (!element.destination.position) {
@@ -197,6 +205,8 @@ class SharedElement extends PureComponent {
   };
   moveToSource = () => {
     const { moveSharedElement } = this.context;
+
+    setNode(this.props);
     const element = getElement(this.props);
 
     if (!element.source.position) {
@@ -223,6 +233,10 @@ class SharedElement extends PureComponent {
   onMoveToDestinationDidComplete = config => {
     const { source, destination } = getElement(this.props);
 
+    // will get the node again later when we need it - we need always current
+    // node beucase it could be changed during
+    set(this.props, 'node', null);
+
     fireEvent(source.props, 'onMoveToDestinationDidComplete');
     fireEvent(destination.props, 'onMoveToDestinationDidComplete');
   };
@@ -234,6 +248,10 @@ class SharedElement extends PureComponent {
   };
   onMoveToSourceDidComplete = config => {
     const { source, destination } = getElement(this.props);
+
+    // will get the node again later when we need it - we need always current
+    // node beucase it could be changed during
+    set(this.props, 'node', null);
 
     fireEvent(destination.props, 'onMoveToSourceDidComplete');
     fireEvent(source.props, 'onMoveToSourceDidComplete');

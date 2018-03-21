@@ -37,14 +37,12 @@ class BottomBar extends PureComponent {
     Animated.timing(this.state.translateY, {
       toValue: 56,
       useNativeDriver: true,
-      duration: 250,
     }).start();
   }
   showAnimation() {
     Animated.timing(this.state.translateY, {
       toValue: 0,
       useNativeDriver: true,
-      duration: 250,
     }).start();
   }
   render() {

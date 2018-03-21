@@ -21,12 +21,14 @@ class ToolbarBackground extends PureComponent {
     Animated.timing(this.state.translateY, {
       toValue: -150,
       useNativeDriver: true,
+      duration: 500,
     }).start();
   }
   showAnimation() {
     Animated.timing(this.state.translateY, {
       toValue: 0,
       useNativeDriver: true,
+      duration: 500,
     }).start();
   }
   render() {

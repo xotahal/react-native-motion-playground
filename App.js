@@ -40,7 +40,6 @@ export default class App extends React.Component {
   onBackPressed = () => {
     this.setState({
       phase: 'phase-3',
-      selectedItem: null,
     });
   };
   onSharedElementMovedToDestination = () => {
@@ -50,11 +49,10 @@ export default class App extends React.Component {
       });
     });
   };
-  onMoveBackAnimationEnded = () => {
+  onSharedElementMovedToSource = () => {
     InteractionManager.runAfterInteractions(() => {
       this.setState({
         selectedItem: null,
-        position: null,
         phase: 'phase-0',
       });
     });
@@ -76,6 +74,7 @@ export default class App extends React.Component {
           onSharedElementMovedToDestination={
             this.onSharedElementMovedToDestination
           }
+          onSharedElementMovedToSource={this.onSharedElementMovedToSource}
         />
       </View>
     );
