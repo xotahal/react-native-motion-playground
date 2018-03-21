@@ -9,8 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import TranslateYAndOpacity from '../../animations/TranslateYAndOpacity';
-import SharedElement from '../../animations/SharedElement';
+import { SharedElement, TranslateYAndOpacity } from 'react-native-motion';
 
 import data from '../../data/data';
 import { ListItem, Row } from '../../components';

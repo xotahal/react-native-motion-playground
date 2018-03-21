@@ -5195,8 +5195,9 @@ react-native-maps@0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-0.19.0.tgz#ce94fad1cf360e335cb4338a68c95f791e869074"
 
-"react-native-motion@file:../../react-native-motion":
-  version "0.1.0"
+react-native-motion@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-motion/-/react-native-motion-0.2.0.tgz#2a3920a52926f80ce19b9ba77a43efaf930c2fd4"
   dependencies:
     prop-types "^15.5.10"
 

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Text, View, FlatList, StyleSheet, Easing } from 'react-native';
 
-import SharedElement from '../../animations/SharedElement';
+import { SharedElement } from 'react-native-motion';
 
 import Toolbar from './Toolbar';
 import BottomBar from './BottomBar';

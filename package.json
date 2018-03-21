@@ -23,6 +23,6 @@
     "moment": "^2.21.0",
     "react": "16.2.0",
     "react-native": "0.52.0",
-    "react-native-motion": "file:../../react-native-motion"
+    "react-native-motion": "^0.2.0"
   }
 }

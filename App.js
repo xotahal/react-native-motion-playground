@@ -1,11 +1,10 @@
 import React from 'react';
 import { InteractionManager, StyleSheet, Text, View } from 'react-native';
+import { SharedElementRenderer } from 'react-native-motion';
 
-import SharedElementRenderer from './src/animations/SharedElementRenderer';
 import List from './src/screens/List/List';
 import Detail from './src/screens/Detail/Detail';
 import ToolbarBackground from './src/screens/Detail/ToolbarBackground';
-import Transform from './src/animations/Transform';
 
 export default class App extends React.Component {
   constructor(props) {
