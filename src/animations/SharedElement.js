@@ -10,7 +10,14 @@ import {
 import PropTypes from 'prop-types';
 
 const propTypes = {
+  // One of these are required
+  id: PropTypes.string,
+  sourceId: PropTypes.string,
+  // Set to true if we want to start with animation immediately when a
+  // destination element is mounted
   startOnDestinationDidMount: PropTypes.bool,
+  // Set to true if we want to start with animation immediately when a
+  // destination element is unmounted
   startOnDestinationWillUnmount: PropTypes.bool,
 };
 const defaultProps = {
@@ -21,33 +28,50 @@ const contextTypes = {
   moveSharedElement: PropTypes.func.isRequired,
 };
 
-// Hashtable of elements
+// Hashtable of elements which are shared between source element and destination
+// element.
 let elements = {};
 // Test if the shred element is destination or source
 const isDestination = props => {
   return !!props.sourceId;
 };
+// Destination element has id as a sourceId and source element has an id as an
+// id prop
 const getKey = props => {
   return props.id || props.sourceId;
 };
+// Create a element with provided id
 const initElement = props => {
   const { id, sourceId } = props;
   const key = id || sourceId;
 
   elements[key] = elements[key] || {
     id: key,
+    // source element of this shared element
     source: {
+      // we want to keep ref to measure position on screen
       ref: null,
+      // to be able fire events
       props: null,
+      // last known position of source - when we lost ref (element was unmounted)
+      // we are still able to show animation even when the element is already
+      // doesn't exist, because we actualy will create new one for animation
+      // anyway, if the source element was part of scrollview for example and
+      // his position was changed since last measure, it will start in bad
+      // position - we need to solve this somehow
       position: null,
     },
+    // destination element of this shared element
     destination: {
+      // it's the same like source, only for destination
       ref: null,
       props: null,
       position: null,
     },
   };
 };
+// To store props of source and destination. We want to fire event even for
+// source element if the destination was animated.
 const setProps = props => {
   const key = getKey(props);
 
@@ -57,6 +81,7 @@ const setProps = props => {
     elements[key].source.props = props;
   }
 };
+// To store references of elements.
 const setRef = (props, node) => {
   const key = getKey(props);
 
@@ -66,6 +91,9 @@ const setRef = (props, node) => {
     elements[key].source.ref = node;
   }
 };
+// Node which will be animated. We are trying to observe element as a clone of
+// children. But if we want to do something with that children (for example
+// set an opacity once it is moved, it is better to provide getNode)
 const setNode = props => {
   const key = getKey(props);
 
@@ -120,9 +148,9 @@ const getAnimationConfig = props => {
     sourceId,
     children,
     onMoveToSourceWillStart,
-    onMoveToSourceDidComplete,
+    onMoveToSourceDidFinish,
     onMoveToDestinationWillStart,
-    onMoveToDestinationDidComplete,
+    onMoveToDestinationDidFinish,
     startOnDestinationDidMount,
     startOnDestinationWillUnmount,
     // should contains only animation config
@@ -199,7 +227,7 @@ class SharedElement extends PureComponent {
         animationConfig: getAnimationConfigOfSource(this.props),
         element: getElement(this.props),
         onMoveWillStart: this.onMoveToDestinationWillStart,
-        onMoveDidComplete: this.onMoveToDestinationDidComplete,
+        onMoveDidComplete: this.onMoveToDestinationDidFinish,
       });
     }
   };
@@ -220,7 +248,7 @@ class SharedElement extends PureComponent {
           source: element.destination,
         },
         onMoveWillStart: this.onMoveToSourceWillStart,
-        onMoveDidComplete: this.onMoveToSourceDidComplete,
+        onMoveDidComplete: this.onMoveToSourceDidFinish,
       });
     }
   };
@@ -230,15 +258,15 @@ class SharedElement extends PureComponent {
     fireEvent(source.props, 'onMoveToDestinationWillStart');
     fireEvent(destination.props, 'onMoveToDestinationWillStart');
   };
-  onMoveToDestinationDidComplete = config => {
+  onMoveToDestinationDidFinish = config => {
     const { source, destination } = getElement(this.props);
 
     // will get the node again later when we need it - we need always current
     // node beucase it could be changed during
     set(this.props, 'node', null);
 
-    fireEvent(source.props, 'onMoveToDestinationDidComplete');
-    fireEvent(destination.props, 'onMoveToDestinationDidComplete');
+    fireEvent(source.props, 'onMoveToDestinationDidFinish');
+    fireEvent(destination.props, 'onMoveToDestinationDidFinish');
   };
   onMoveToSourceWillStart = config => {
     const { source, destination } = getElement(this.props);
@@ -246,15 +274,15 @@ class SharedElement extends PureComponent {
     fireEvent(destination.props, 'onMoveToSourceWillStart');
     fireEvent(source.props, 'onMoveToSourceWillStart');
   };
-  onMoveToSourceDidComplete = config => {
+  onMoveToSourceDidFinish = config => {
     const { source, destination } = getElement(this.props);
 
     // will get the node again later when we need it - we need always current
     // node beucase it could be changed during
     set(this.props, 'node', null);
 
-    fireEvent(destination.props, 'onMoveToSourceDidComplete');
-    fireEvent(source.props, 'onMoveToSourceDidComplete');
+    fireEvent(destination.props, 'onMoveToSourceDidFinish');
+    fireEvent(source.props, 'onMoveToSourceDidFinish');
   };
   onSourceLayout = data => {
     const element = getElement(this.props);

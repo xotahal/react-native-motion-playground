@@ -26,7 +26,7 @@ class List extends PureComponent {
   onMoveToDestinationWillStart = () => {
     this.setState({ opacityOfSelectedItem: 0 });
   };
-  onMoveToSourceDidComplete = () => {
+  onMoveToSourceDidFinish = () => {
     this.setState({ opacityOfSelectedItem: 1 });
   };
   getSharedNode = props => {
@@ -52,7 +52,7 @@ class List extends PureComponent {
         ref={node => (this.sharedElementRefs[id] = node)}
         id={id}
         onMoveToDestinationWillStart={this.onMoveToDestinationWillStart}
-        onMoveToSourceDidComplete={this.onMoveToSourceDidComplete}
+        onMoveToSourceDidFinish={this.onMoveToSourceDidFinish}
         getNode={this.getSharedNode}
         item={item}
       >

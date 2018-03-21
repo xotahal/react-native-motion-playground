@@ -30,7 +30,7 @@ class Detail extends PureComponent {
       this.sharedElementRef.moveToSource();
     }
   }
-  onMoveToDestinationDidComplete = () => {
+  onMoveToDestinationDidFinish = () => {
     this.setState({ opacityOfDestinationItem: 1 });
     this.props.onSharedElementMovedToDestination();
   };
@@ -85,9 +85,9 @@ class Detail extends PureComponent {
           ref={node => (this.sharedElementRef = node)}
           sourceId={selectedItem.name}
           easing={Easing.in(Easing.back())}
-          onMoveToDestinationDidComplete={this.onMoveToDestinationDidComplete}
+          onMoveToDestinationDidFinish={this.onMoveToDestinationDidFinish}
           onMoveToSourceWillStart={this.onMoveToSourceWillStart}
-          onMoveToSourceDidComplete={onSharedElementMovedToSource}
+          onMoveToSourceDidFinish={onSharedElementMovedToSource}
         >
           <View
             style={{

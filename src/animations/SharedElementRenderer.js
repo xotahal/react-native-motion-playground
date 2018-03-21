@@ -13,6 +13,8 @@ const childContextTypes = {
   moveSharedElement: PropTypes.func.isRequired,
 };
 
+// We need shared element to be rendered after the whole application because it
+// be on the screen with position absolute and will cover everything on screen
 class SharedElementRenderer extends PureComponent {
   getChildContext() {
     return {
