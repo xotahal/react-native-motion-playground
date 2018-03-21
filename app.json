@@ -1,5 +1,8 @@
 {
   "expo": {
+    "name": "React Native Motion Example",
+    "slug": "react-native-motion-example",
+    "version": "0.0.1",
     "sdkVersion": "25.0.0"
   }
 }
