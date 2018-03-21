@@ -18,6 +18,11 @@ import Toolbar from './Toolbar';
 import BottomBar from './BottomBar';
 
 class Detail extends PureComponent {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.phase === 'phase-2' && nextProps.phase === 'phase-3') {
+      this.sharedElementRef.moveToSource();
+    }
+  }
   onHideAnimationEnded = ({ index }) => {
     if (index === 0) {
       this.props.onDetailAnimationEnd();
@@ -60,7 +65,7 @@ class Detail extends PureComponent {
       startPosition,
       phase,
       onBackPress,
-      onSharedElementMoved,
+      onSharedElementMovedToDestination,
     } = this.props;
     const { items = [] } = selectedItem || {};
 
@@ -72,10 +77,11 @@ class Detail extends PureComponent {
       <View style={styles.container}>
         <Toolbar isHidden={phase === 'phase-3'} onBackPress={onBackPress} />
         <SharedElement
+          ref={node => (this.sharedElementRef = node)}
           sourceId={selectedItem.name}
           easing={Easing.in(Easing.back())}
-          duration={1000}
-          onMoveComplete={onSharedElementMoved}
+          duration={500}
+          onMoveToDestinationDidComplete={onSharedElementMovedToDestination}
         >
           <View style={{ backgroundColor: 'transparent' }}>
             <ListItem

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import { Text, View, FlatList, StyleSheet, Easing } from 'react-native';
 
 import SharedElement from '../../animations/SharedElement';
 
@@ -12,24 +12,28 @@ class List extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.itemRefs = {};
+    this.sharedElementRefs = {};
   }
   onListItemPressed = item => {
     const { onItemPress } = this.props;
     onItemPress(item);
 
-    // this.itemRefs[item.name].measure((x, y, width, height, pageX, pageY) => {
-    //   onItemPress(item, { width, pageX, pageY });
-    // });
+    this.sharedElementRefs[item.name].moveToDestination();
   };
   renderItem = ({ item }) => {
     const { selectedItem } = this.props;
 
     const isHidden = selectedItem && selectedItem.name !== item.name;
     const isSelected = selectedItem && selectedItem.name === item.name;
+    const id = item.name;
 
     return (
-      <SharedElement id={item.name}>
+      <SharedElement
+        easing={Easing.in(Easing.back())}
+        duration={250}
+        ref={node => (this.sharedElementRefs[id] = node)}
+        id={id}
+      >
         <View style={{ backgroundColor: 'transparent' }}>
           <ListItem
             item={item}

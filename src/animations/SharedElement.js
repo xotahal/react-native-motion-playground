@@ -9,145 +9,292 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
+const propTypes = {
+  startOnDestinationDidMount: PropTypes.bool,
+  startOnDestinationWillUnmount: PropTypes.bool,
+};
+const defaultProps = {
+  startOnDestinationDidMount: false,
+  startOnDestinationWillUnmount: false,
+};
 const contextTypes = {
   moveSharedElement: PropTypes.func.isRequired,
 };
-// To registrate elements
+
+// Hashtable of elements
 let elements = {};
+// Test if the shred element is destination or source
+const isDestination = props => {
+  return !!props.sourceId;
+};
+const getKey = props => {
+  return props.id || props.sourceId;
+};
+const initElement = props => {
+  const { id, sourceId } = props;
+  const key = id || sourceId;
+
+  elements[key] = elements[key] || {
+    id: key,
+    source: {
+      ref: null,
+      props: null,
+      position: null,
+    },
+    destination: {
+      ref: null,
+      props: null,
+      position: null,
+    },
+  };
+};
+const setProps = props => {
+  const key = getKey(props);
+
+  if (isDestination(props)) {
+    elements[key].destination.props = props;
+  } else {
+    elements[key].source.props = props;
+  }
+};
+const setRef = (props, node) => {
+  const key = getKey(props);
+
+  if (isDestination(props)) {
+    elements[key].destination.ref = node;
+  } else {
+    elements[key].source.ref = node;
+  }
+};
+const setNode = props => {
+  // create a record in elements
+  if (isDestination(props)) {
+    const { sourceId, children } = props;
+    // this node will be animated
+    elements[sourceId].node = React.cloneElement(children);
+  }
+};
+const setSourcePosition = (props, position) => {
+  if (!position) {
+    return;
+  }
+
+  set(props, 'waitingForSource', false);
+
+  const key = getKey(props);
+  elements[key].source.position = position;
+};
+const setDestinationPosition = (props, position) => {
+  if (!position) {
+    return;
+  }
+
+  set(props, 'waitingForDestination', false);
+
+  const key = getKey(props);
+  elements[key].destination.position = position;
+};
+const set = (props, propName, value) => {
+  const key = getKey(props);
+  elements[key][propName] = value;
+};
+const get = (props, propName) => {
+  const key = getKey(props);
+  return elements[key][propName];
+};
+const getElement = props => {
+  const key = getKey(props);
+  return elements[key];
+};
+const getAnimationConfig = props => {
+  // get only animation config
+  const {
+    id,
+    sourceId,
+    children,
+    onMoveToSourceWillStart,
+    onMoveToSourceDidComplete,
+    onMoveToDestinationWillStart,
+    onMoveToDestinationDidComplete,
+    startOnDestinationDidMount,
+    startOnDestinationWillUnmount,
+    // should contains only animation config
+    ...animationConfig
+  } = props;
+
+  return animationConfig;
+};
+const getAnimationConfigOfSource = props => {
+  const element = getElement(props);
+  return getAnimationConfig(element.source.props);
+};
+const getAnimationConfigOfDestination = props => {
+  const element = getElement(props);
+  return getAnimationConfig(element.destination.props);
+};
+const fireEvent = (props, name) => {
+  if (props[name]) {
+    props[name]();
+  }
+};
 
 class SharedElement extends PureComponent {
   constructor(props) {
     super(props);
-
-    const { id, sourceOf } = props;
-
-    if (id) {
-      elements = {
-        ...elements,
-        [id]: {
-          sourceOf,
-        },
-      };
-    }
-
-    this.state = {
-      destinationOpacity: 0,
-    };
+    // just create an object for this shared element
+    initElement(props);
   }
   componentDidMount() {
-    const { sourceId, children } = this.props;
-    // destination component
-    if (sourceId) {
-      // we will animate this node
-      elements[sourceId].node = React.cloneElement(children);
+    setProps(this.props);
+    setNode(this.props);
+  }
+  componentWillReceiveProps(nextProps) {
+    setProps(nextProps);
+  }
+  componentWillUnmount() {
+    const { startOnDestinationWillUnmount } = this.props;
+
+    if (startOnDestinationWillUnmount && isDestination(this.props)) {
+      const { moveSharedElement } = this.context;
+      const { sourceId, children, onMoveComplete, ...rest } = this.props;
+      const element = getElement(this.props);
+
+      this.moveToSource();
     }
   }
-  storeRef = node => {
-    const { id, sourceId, children } = this.props;
-
-    if (id) {
-      // Keep reference for us
-      elements[id].sourceRef = node;
-    } else if (sourceId) {
-      // Keep reference for us
-      elements[sourceId].destinationRef = node;
-    }
-
+  setRef = node => {
+    setRef(this.props, node);
     // Call the original ref, if there is any
-    const { ref } = children;
+    const { ref } = this.props.children;
     if (typeof ref === 'function') {
       ref(node);
     }
   };
-  onMoveCompleted = () => {
-    const { onMoveComplete } = this.props;
-
-    this.setState({
-      destinationOpacity: 1,
-    });
-
-    if (onMoveComplete) {
-      onMoveComplete();
+  measure = (ref, callback) => {
+    if (!ref) {
+      callback(null);
     }
+
+    ref.measure((x, y, width, height, pageX, pageY) => {
+      const position = { x, y, width, height, pageX, pageY };
+      callback(position);
+    });
   };
-  onSourceLayout = data => {
-    const { children, id } = this.props;
+  moveToDestination = () => {
+    const { moveSharedElement } = this.context;
+    const element = getElement(this.props);
 
-    const { sourceRef } = elements[id];
-
-    if (sourceRef) {
-      sourceRef.measure((x, y, width, height, pageX, pageY) => {
-        const position = { x, y, width, height, pageX, pageY };
-        elements[id].sourcePosition = position;
+    if (!element.destination.position) {
+      set(this.props, 'waitingForDestination', true);
+    } else {
+      moveSharedElement({
+        animationConfig: getAnimationConfigOfSource(this.props),
+        element: getElement(this.props),
+        onMoveWillStart: this.onMoveToDestinationWillStart,
+        onMoveDidComplete: this.onMoveToDestinationDidComplete,
       });
     }
+  };
+  moveToSource = () => {
+    const { moveSharedElement } = this.context;
+    const element = getElement(this.props);
+
+    if (!element.source.position) {
+      set(this.props, 'waitingForSource', true);
+    } else {
+      moveSharedElement({
+        animationConfig: getAnimationConfigOfDestination(this.props),
+        element: {
+          ...element,
+          destination: element.source,
+          source: element.destination,
+        },
+        onMoveWillStart: this.onMoveToSourceWillStart,
+        onMoveDidComplete: this.onMoveToSourceDidComplete,
+      });
+    }
+  };
+  onMoveToDestinationWillStart = config => {
+    const { source, destination } = getElement(this.props);
+
+    fireEvent(source.props, 'onMoveToDestinationWillStart');
+    fireEvent(destination.props, 'onMoveToDestinationWillStart');
+  };
+  onMoveToDestinationDidComplete = config => {
+    const { source, destination } = getElement(this.props);
+
+    fireEvent(source.props, 'onMoveToDestinationDidComplete');
+    fireEvent(destination.props, 'onMoveToDestinationDidComplete');
+  };
+  onMoveToSourceWillStart = config => {
+    const { source, destination } = getElement(this.props);
+
+    fireEvent(destination.props, 'onMoveToSourceWillStart');
+    fireEvent(source.props, 'onMoveToSourceWillStart');
+  };
+  onMoveToSourceDidComplete = config => {
+    const { source, destination } = getElement(this.props);
+
+    fireEvent(destination.props, 'onMoveToSourceDidComplete');
+    fireEvent(source.props, 'onMoveToSourceDidComplete');
+  };
+  onSourceLayout = data => {
+    const element = getElement(this.props);
+
+    const { ref } = element.source;
+    this.measure(ref, position => {
+      const startAnimation = get(this.props, 'waitingForSource');
+      setSourcePosition(this.props, position);
+
+      // if the user wanted to move to destination but there wasn't source yet
+      if (startAnimation) {
+        this.moveToSource();
+      }
+    });
 
     // Call original if any
-    const { onLayout } = children;
+    const { onLayout } = this.props.children;
     if (typeof onLayout === 'function') {
       onLayout(data);
     }
   };
   onDestinationLayout = data => {
-    const { moveSharedElement } = this.context;
-    const { children, sourceId, onMoveComplete, ...rest } = this.props;
+    const { startOnDestinationDidMount } = this.props;
+    const { source, destination } = getElement(this.props);
 
-    const { sourceRef, destinationRef } = elements[sourceId];
+    this.measure(source.ref, position => {
+      setSourcePosition(this.props, position);
 
-    if (sourceRef) {
-      sourceRef.measure((x, y, width, height, pageX, pageY) => {
-        const position = { x, y, width, height, pageX, pageY };
-        elements[sourceId].sourcePosition = position;
+      this.measure(destination.ref, position => {
+        const startAnimation = get(this.props, 'waitingForDestination');
+        setDestinationPosition(this.props, position);
 
-        destinationRef.measure((x, y, width, height, pageX, pageY) => {
-          const position = { x, y, width, height, pageX, pageY };
-          elements[sourceId].destinationPosition = position;
-
-          moveSharedElement({
-            ...elements[sourceId],
-            ...rest,
-            onMoveComplete: this.onMoveCompleted,
-          });
-
-          sourceRef.setNativeProps({ opacity: 0 });
-        });
-      });
-    }
-
-    destinationRef.measure((x, y, width, height, pageX, pageY) => {
-      const position = { x, y, width, height, pageX, pageY };
-      elements[sourceId].destinationPosition = position;
-
-      moveSharedElement({
-        ...elements[sourceId],
-        ...rest,
-        onMoveComplete: this.onMoveCompleted,
+        if (startAnimation || startOnDestinationDidMount) {
+          this.moveToDestination();
+        }
       });
     });
 
     // Call original if any
-    const { onLayout } = children;
+    const { onLayout } = this.props.children;
     if (typeof onLayout === 'function') {
       onLayout(data);
     }
   };
   renderSource() {
-    const { children, id } = this.props;
+    const { children } = this.props;
 
     return React.cloneElement(this.props.children, {
-      ref: this.storeRef,
+      ref: this.setRef,
       onLayout: this.onSourceLayout,
     });
   }
   renderDestination() {
     const { children } = this.props;
-    const { sourcePosition, topValue, destinationOpacity } = this.state;
-    const { height, width } = sourcePosition || {};
 
     return React.cloneElement(children, {
-      ref: this.storeRef,
+      ref: this.setRef,
       onLayout: this.onDestinationLayout,
-      style: { opacity: destinationOpacity },
     });
   }
   render() {
@@ -171,6 +318,8 @@ const styles = StyleSheet.create({
   },
 });
 
+SharedElement.propTypes = propTypes;
+SharedElement.defaultProps = defaultProps;
 SharedElement.contextTypes = contextTypes;
 
 export default SharedElement;

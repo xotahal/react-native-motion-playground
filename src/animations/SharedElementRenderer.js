@@ -23,66 +23,90 @@ class SharedElementRenderer extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.isRunning = {};
     this.state = {
       config: null,
     };
   }
-  onMoveCompleted = () => {
+  onMoveWillStart = () => {
     const { config } = this.state;
-    const { onMoveComplete } = config || {};
+    const { onMoveWillStart, element } = config;
+    const { id } = element;
 
-    if (onMoveComplete) {
-      onMoveComplete();
+    this.isRunning[id] = true;
+
+    if (onMoveWillStart) {
+      onMoveWillStart(config);
+    }
+  };
+  onMoveDidComplete = () => {
+    const { config } = this.state;
+    const { onMoveDidComplete, element } = config;
+    const { id } = element;
+
+    this.isRunning[id] = false;
+
+    if (onMoveDidComplete) {
+      onMoveDidComplete(config);
     }
 
+    this.reset();
+  };
+  reset = () => {
     this.setState({ config: null });
   };
   // This method will compute animations. Position and scale.
   getAnimations = config => {
-    const { sourcePosition, destinationPosition, ...rest } = config;
+    const { element, animationConfig } = config;
+    const { source, destination } = element;
 
     const animations = [];
 
-    if (sourcePosition.pageY !== destinationPosition.pageY) {
-      this.setState({ topValue: new Animated.Value(sourcePosition.pageY) });
+    if (source.position.pageY !== destination.position.pageY) {
+      const translateYValue = new Animated.Value(source.position.pageY);
+      this.setState({ translateYValue });
 
       animations.push(
-        Animated.timing(this.state.topValue, {
-          toValue: destinationPosition.pageY + 100,
-          ...rest,
+        Animated.timing(translateYValue, {
+          toValue: destination.position.pageY,
+          useNativeDriver: true,
+          ...animationConfig,
         })
       );
     }
-    if (sourcePosition.pageX !== destinationPosition.pageX) {
-      this.setState({ leftValue: new Animated.Value(sourcePosition.pageX) });
-
-      animations.push(
-        Animated.timing(this.state.leftValue, {
-          toValue: destinationPosition.pageX,
-          ...rest,
-        })
-      );
-    }
-    if (sourcePosition.width !== destinationPosition.width) {
-      this.setState({ scaleValue: new Animated.Value(1) });
-
-      animations.push(
-        Animated.timing(this.state.scaleValue, {
-          toValue: sourcePosition.width / destinationPosition.width,
-          ...rest,
-        })
-      );
-    }
+    // if (sourcePosition.pageX !== destinationPosition.pageX) {
+    //   this.setState({
+    //     translateXValue: new Animated.Value(sourcePosition.pageX),
+    //   });
+    //
+    //   animations.push(
+    //     Animated.timing(this.state.translateXValue, {
+    //       toValue: destinationPosition.pageX,
+    //       useNativeDriver: true,
+    //       ...rest,
+    //     })
+    //   );
+    // }
+    // if (sourcePosition.width !== destinationPosition.width) {
+    //   this.setState({ scaleValue: new Animated.Value(1) });
+    //
+    //   animations.push(
+    //     Animated.timing(this.state.scaleValue, {
+    //       toValue: sourcePosition.width / destinationPosition.width,
+    //       useNativeDriver: true,
+    //       ...rest,
+    //     })
+    //   );
+    // }
 
     return animations;
   };
   moveSharedElement = config => {
-    const {
-      sourcePosition,
-      destinationPosition,
-      onMoveComplete,
-      ...rest
-    } = config;
+    const { id } = config.element;
+    // animation was already started
+    if (this.isRunning[id]) {
+      return;
+    }
 
     const animations = this.getAnimations(config);
 
@@ -91,35 +115,41 @@ class SharedElementRenderer extends PureComponent {
     });
 
     setTimeout(() => {
-      Animated.parallel(animations).start(this.onMoveCompleted);
+      this.onMoveWillStart();
+      Animated.parallel(animations).start(this.onMoveDidComplete);
     }, 0);
   };
   renderSharedElement() {
-    const { config, topValue, leftValue, scaleValue } = this.state;
-    const { sourcePosition, node } = config || {};
-    const { height, width } = sourcePosition || {};
+    const { config, translateYValue, translateXValue, scaleValue } = this.state;
+    const { element } = config || {};
+    const { source, node } = element || {};
+    const { position } = source || {};
+    const { height, width } = position || {};
 
     if (!config) {
       return null;
     }
 
+    const transform = [];
+
+    if (translateYValue) {
+      transform.push({ translateY: translateYValue });
+    }
+    // if (translateXValue) {
+    //   transform.push({ translateX: translateXValue });
+    // }
+    // if (scaleValue) {
+    //   transform.push({ scale: scaleValue });
+    // }
+
     const animatedStyle = {
       height,
       width,
+      transform,
     };
 
-    if (topValue) {
-      animatedStyle.top = topValue;
-    }
-    if (leftValue) {
-      animated.left = leftValue;
-    }
-    if (scaleValue) {
-      animated.transform = [{ scale: scaleValue }];
-    }
-
     return (
-      <View style={styles.container}>
+      <View style={styles.container} pointerEvents="none">
         <Animated.View style={[styles.positionContainer, animatedStyle]}>
           {node}
         </Animated.View>

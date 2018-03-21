@@ -43,7 +43,7 @@ export default class App extends React.Component {
       selectedItem: null,
     });
   };
-  onSharedElementMoved = () => {
+  onSharedElementMovedToDestination = () => {
     InteractionManager.runAfterInteractions(() => {
       this.setState({
         phase: 'phase-2',
@@ -62,19 +62,6 @@ export default class App extends React.Component {
   renderPage() {
     const { selectedItem, position, detailItem, phase } = this.state;
 
-    let detailPage = null;
-
-    if (selectedItem) {
-      detailPage = (
-        <Detail
-          phase={phase}
-          selectedItem={selectedItem}
-          onBackPress={this.onBackPressed}
-          onSharedElementMoved={this.onSharedElementMoved}
-        />
-      );
-    }
-
     return (
       <View style={{ flex: 1 }}>
         <List
@@ -82,7 +69,14 @@ export default class App extends React.Component {
           onItemPress={this.onItemPressed}
           phase={phase}
         />
-        {detailPage}
+        <Detail
+          phase={phase}
+          selectedItem={selectedItem}
+          onBackPress={this.onBackPressed}
+          onSharedElementMovedToDestination={
+            this.onSharedElementMovedToDestination
+          }
+        />
       </View>
     );
   }
